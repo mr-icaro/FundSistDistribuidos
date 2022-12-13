@@ -1,25 +1,25 @@
 import socket
 
 
-def client_program():
-    host = socket.gethostname()  # as both code is running on same pc
-    port = 5000  # socket server port number
+def cliente_banco():
+    host = socket.gethostname()  # utilizo esse comando pq estão ambos na mesma máquina
+    port = 5001  #  numero da porta do servidor socket
 
-    client_socket = socket.socket()  # instantiate
-    client_socket.connect((host, port))  # connect to the server
+    client_socket = socket.socket()  # inicia a instância do socket
+    client_socket.connect((host, port))  # conecta no servidor
 
-    message = input(" -> ")  # take input
+    message = input(" -> ")  # aguarda a entrada de dados
 
-    while message.lower().strip() != 'bye':
-        client_socket.send(message.encode())  # send message
-        data = client_socket.recv(1024).decode()  # receive response
+    while message.lower().strip() != 'finalizar': #se digitar finalizar, termina o programa para o cliente e o servidor tb
+        client_socket.send(message.encode())  # envia a mensagem para o servidor
+        data = client_socket.recv(1024).decode()  # recebe a resposta do servidor
 
-        print('Received from server: ' + data)  # show in terminal
+        print('Received from server: ' + data)  # Mostra os dados recebidos no terminal
 
-        message = input(" -> ")  # again take input
+        message = input(" -> ")  # aguarda uma nova entrada de dados do usuario
 
-    client_socket.close()  # close the connection
+    client_socket.close()  # finaliza a conexão
 
 
 if __name__ == '__main__':
-    client_program()
+    cliente_banco()
