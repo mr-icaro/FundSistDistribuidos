@@ -1,3 +1,11 @@
+# Universidade Federal da Bahia
+# Disciplina: Fundamentos de Sistemas Distribuídos
+# Professor: Raimundo Macêdo
+# Projeto: Sistema Distribuído Simples para Manutenção de Contas Bancárias
+# Desenvolvedores: Felipe Nascimento (felipern@ufba.br), e Icaro Brito (icarobss@ufba.br)
+# 2022
+
+# Importa biblioteca necessária para o funcionamento da comunicação
 import socket
 
 # Função que administra a conexão no lado do cliente,
@@ -6,7 +14,7 @@ def cliente_banco():
     host = socket.gethostname()  # Recebe o nome do host, que também é usado pelo servidor por estarem ambos na mesma máquina
     port = 5001  # Número da porta do servidor socket
 
-    client_socket = socket.socket()  # Inicia a instância do socket
+    client_socket = socket.socket()  # Cria a instância do socket
     client_socket.connect((host, port))  # Conecta ao servidor
 
     mensagem = ''  # Define a mensagem
@@ -30,4 +38,7 @@ def cliente_banco():
 
 
 if __name__ == '__main__':
+    # Chama a função principal para iniciar
+    # a conexão do cliente com o servidor,
+    # e solicitar as operações bancárias
     cliente_banco()
