@@ -2,11 +2,11 @@ import socket
 
 
 def cliente_banco():
-    host = socket.gethostname()  # utilizo esse comando pq estão ambos na mesma máquina
-    port = 5001  #  numero da porta do servidor socket
+    host = socket.gethostname()  # Recebe o nome do host, que também é usado pelo servidor por estarem ambos na mesma máquina
+    port = 5001  #  Número da porta do servidor socket
 
-    client_socket = socket.socket()  # inicia a instância do socket
-    client_socket.connect((host, port))  # conecta no servidor
+    client_socket = socket.socket()  # Inicia a instância do socket
+    client_socket.connect((host, port))  # Conecta ao servidor
 
     message = 'iniciar'  # aguarda a entrada de dados
 

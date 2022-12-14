@@ -30,7 +30,7 @@ def sacar(conta, valor, conn):
 def transferir(conta, conta_destino, valor, conn):	
     if valor <= conta.saldo:
         conta.saldo -= valor
-        conta.extrato(-valor)
+        conta_destino.saldo += valor
         mensagem = f'Transferência de R${valor:.2F} realizada com sucesso.'
         conn.send(mensagem.encode())
         mostrar_saldo(conta, conn)
@@ -40,27 +40,68 @@ def transferir(conta, conta_destino, valor, conn):
         menu(conta, conn)
         
 def menu(conta, conn):
-    mensagem = ('\n\nMENU DE OPERAÇÕES\nOpções:\n1 - Saldo\n2 - Depósito\n3 - Saque\n4 - Transferência\n5 - Sair\nDigite a opção desejada: ')
+    mensagem = ('\n\nMENU DE OPERAÇÕES\nOpções:\n1 - Saldo\n2 - Depósito\n3 - Saque\n4 - Transferência\n5 - Sair\n6 - Novo login\nDigite a opção desejada: ')
     conn.send(mensagem.encode())
     opcao = str(conn.recv(1024).decode())
 
     if opcao == '1':
         mostrar_saldo(conta, conn)
+
     elif opcao == '2':
         mensagem = ('Digite o valor a ser depositado: ')
         conn.send(mensagem.encode())
         valor = float(conn.recv(1024).decode())
         depositar(conta, valor, conn)
+
     elif opcao == '3':
         mensagem = ('Digite o valor a ser sacado: ')
         conn.send(mensagem.encode())
         valor = float(conn.recv(1024).decode())
         sacar(conta, valor, conn)
+
+    elif opcao == '4':
+        mensagem = ('Digite o valor que deseja transferir: ')
+        conn.send(mensagem.encode())
+        valor = float(conn.recv(1024).decode())
+        mensagem = ('Digite a conta para qual deseja transferir: ')
+        conn.send(mensagem.encode())
+        conta_destino = str(conn.recv(1024).decode())
+        beneficiario = ''
+
+        if conta.numero_conta == conta_destino:
+            mensagem = ('Não é possível transferir para sua própria conta.')
+            conn.send(mensagem.encode())
+            menu(conta, conn)
+        else:
+            if conta_destino == pessoa1.numero_conta:
+                beneficiario = pessoa1.cliente
+                cliente_destino = pessoa1
+            else:
+                beneficiario = pessoa2.cliente
+                cliente_destino = pessoa2
+
+            mensagem = (f'Nome do beneficiário: {beneficiario}. Tecle S para confirmar a operação, ou N para cancelar')
+            conn.send(mensagem.encode())
+            confirmacao = str(conn.recv(1024).decode())
+            if confirmacao == 'S' or confirmacao == 's': 
+                transferir(conta, cliente_destino, valor, conn)
+            else:
+                mensagem = ('\nOperação cancelada.\n')
+                conn.send(mensagem.encode())
+                menu(conta, conn)
+
+
     elif opcao == '5':
         mensagem = ('\nEncerrando...')
         conn.send(mensagem.encode())
         conn.close()
         exit()
+
+    elif opcao =='6':
+        mensagem = ('Insira seus dados para fazer um novo login')
+        conn.send(mensagem.encode())
+        fazer_login(conn, autenticacao=False)
+
 
 def mostrar_saldo(conta, conn):
     mensagem = (f'\nCLIENTE: {conta.cliente} RG: {conta.rg}')
@@ -83,23 +124,7 @@ def mostrar_saldo(conta, conn):
         conn.close()
         exit()
         
-
-
-def servidor_banco():
-    # solicita o nome do host
-    host = socket.gethostname()
-    porta = 5001  # inicia a porta
-    autenticacao = False
-
-    server_socket = socket.socket()  # instância do socket
-
-    server_socket.bind((host, porta))  # A função "bind" hospeda o endereço do host e da porta juntos
-
-    # Configura quantos clientes o servidor pode escutar simultâenamente
-    server_socket.listen(2)
-    conn, address = server_socket.accept()  # Aceita uma nova conexão
-    print("Conectado com: " + str(address))
-
+def fazer_login(conn, autenticacao):
     while True:
         if autenticacao == False:
             mensagem = '\nDigite o número da sua conta: '
@@ -137,6 +162,25 @@ def servidor_banco():
                     mensagem = '\nSenha incorreta.'
                     conn.send(mensagem.encode())
                     break
+
+
+def servidor_banco():
+    # solicita o nome do host
+    host = socket.gethostname()
+    porta = 5001  # inicia a porta
+    autenticacao = False
+
+    server_socket = socket.socket()  # instância do socket
+
+    server_socket.bind((host, porta))  # A função "bind" hospeda o endereço do host e da porta juntos
+
+    # Configura quantos clientes o servidor pode escutar simultâenamente
+    server_socket.listen(2)
+    conn, address = server_socket.accept()  # Aceita uma nova conexão
+    print("Conectado com: " + str(address))
+    autenticacao = False
+
+    fazer_login(conn, autenticacao)
 
     conn.close()  # Finaliza a conexão
 
